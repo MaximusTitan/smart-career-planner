@@ -23,9 +23,9 @@ export function Header() {
   return (
     <header className="border-b-2 border-violet-100 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-2xl font-black text-violet-800">
+        <Link href="/" className="flex items-center gap-2 text-xl font-black text-violet-800 sm:text-2xl">
           <Ollie size={40} />
-          Dream Jobs
+          Smart Career Planner
         </Link>
         {/* usePathname needs the URL, so it streams in behind Suspense */}
         <Suspense fallback={<div className="h-8 w-80" aria-hidden />}>

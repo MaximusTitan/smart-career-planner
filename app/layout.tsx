@@ -13,7 +13,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Dream Jobs: find what you could become",
+  title: "Smart Career Planner: find what you could become",
   description:
     "A friendly AI career explorer for kids in Grades 4 to 6. Answer fun questions, meet your career matches and chat with Ollie the owl.",
 };

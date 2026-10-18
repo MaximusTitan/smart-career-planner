@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Card, ButtonLink } from "@/components/ui";
 import { getSupabase } from "@/lib/supabase";
 
-export const metadata = { title: "A Dream Jobs plan", robots: { index: false } };
+export const metadata = { title: "A Smart Career Planner plan", robots: { index: false } };
 
 type Plan = {
   name: string;
@@ -62,7 +62,7 @@ async function SharedPlan({ params }: { params: PageProps<"/plan/[id]">["params"
         </p>
       </Card>
       <div className="text-center">
-        <ButtonLink href="/">Try Dream Jobs yourself</ButtonLink>
+        <ButtonLink href="/">Try Smart Career Planner yourself</ButtonLink>
       </div>
     </div>
   );

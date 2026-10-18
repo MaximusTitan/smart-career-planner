@@ -1,4 +1,4 @@
-# Dream Jobs (Smart Career Planner)
+# Smart Career Planner
 
 An AI career explorer for kids in Grades 4 to 6. Kids tap through a short "About me" and 5-question quiz, get career matches with simple explanations and what to study, see a grade-by-grade adventure map, compare jobs, chat with Ollie the owl, and save or share a one-page plan.
 
