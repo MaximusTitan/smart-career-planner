@@ -2,19 +2,11 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import type { Career, Profile } from "./types";
+import type { Career, Profile, SavedState } from "./types";
+import { useAuth } from "./auth";
+import { syncState } from "./sync";
 import { EMPTY_PROFILE } from "./options";
 
-type SavedState = {
-  sessionId: string;
-  profile: Profile;
-  careers: Career[];
-  selectedId: string | null;
-  compareIds: string[];
-  savedIds: string[];
-  doneMissions: string[];
-  source: "ai" | "offline" | null;
-};
 
 type Store = SavedState & {
   ready: boolean;
@@ -28,6 +20,8 @@ type Store = SavedState & {
   toggleSaved: (id: string) => void;
   toggleMission: (mission: string) => void;
   restart: () => void;
+  /** Replace this device's progress with a kid profile's saved data (after sign-in or "play as"). */
+  adopt: (data: Partial<SavedState>) => void;
 };
 
 const KEY = "dream-jobs-v1";
@@ -61,6 +55,7 @@ const PRE_READY: Store = {
   toggleSaved: noop,
   toggleMission: noop,
   restart: noop,
+  adopt: noop,
 };
 
 const Ctx = createContext<Store>(PRE_READY);
@@ -74,6 +69,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const syncTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const auth = useAuth();
+  const target = useRef({ kid: auth.kid, playing: auth.playing, adultSignedIn: auth.adult !== null });
+  useEffect(() => {
+    target.current = { kid: auth.kid, playing: auth.playing, adultSignedIn: auth.adult !== null };
+  }, [auth.kid, auth.playing, auth.adult]);
 
   // Load the saved state in the browser after first paint (keeps server and client HTML identical).
   useEffect(() => {
@@ -98,11 +98,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     clearTimeout(syncTimer.current);
     syncTimer.current = setTimeout(() => {
-      fetch("/api/session", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: state.sessionId, data: state }),
-      }).catch(() => {});
+      syncState(target.current, state).catch(() => {});
     }, 1500);
     return () => clearTimeout(syncTimer.current);
   }, [state]);
@@ -151,7 +147,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleCompare: (id) => patch({ compareIds: toggle(state.compareIds, id, 2) }),
       toggleSaved: (id) => patch({ savedIds: toggle(state.savedIds, id) }),
       toggleMission: (m) => patch({ doneMissions: toggle(state.doneMissions, m) }),
-      restart: () => patch({ ...freshState(), sessionId: state.sessionId }),
+      restart: () => patch({ ...freshState() }),
+      adopt: (data) => setState((s) => ({ ...freshState(), ...data, sessionId: s?.sessionId ?? crypto.randomUUID() })),
     };
   }, [state, loading, error, patch]);
 

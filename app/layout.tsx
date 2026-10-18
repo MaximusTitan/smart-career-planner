@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth";
 import { StoreProvider } from "@/lib/store";
 import { Header } from "@/components/Header";
 import { ChatWidget } from "@/components/ChatWidget";
@@ -21,11 +22,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${nunito.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <StoreProvider>
-          <Header />
-          <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">{children}</main>
-          <ChatWidget />
-        </StoreProvider>
+        <AuthProvider>
+          <StoreProvider>
+            <Header />
+            <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">{children}</main>
+            <ChatWidget />
+          </StoreProvider>
+        </AuthProvider>
       </body>
     </html>
   );

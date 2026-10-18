@@ -34,3 +34,15 @@ export type Profile = {
 };
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
+
+/** Everything one student's device remembers. Saved locally and to Supabase. */
+export type SavedState = {
+  sessionId: string;
+  profile: Profile;
+  careers: Career[];
+  selectedId: string | null;
+  compareIds: string[];
+  savedIds: string[];
+  doneMissions: string[];
+  source: "ai" | "offline" | null;
+};

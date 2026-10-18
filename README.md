@@ -18,3 +18,10 @@ It works with no keys: matching uses a built-in career catalog and Ollie gives s
 ## Kid safety
 
 No logins or personal data: just a first name or nickname and an anonymous session id. Ollie's prompt keeps answers simple, on topic, and free of salary numbers or "you can't" language.
+
+## Accounts
+
+- **Parents and teachers** sign up at `/signup` (Supabase Auth, email + password) and manage kids at `/dashboard`: add a child with a nickname and a 4-number PIN, see their interests, job ideas and mission progress, play as them, change their PIN, or remove them.
+- **Students** never need an email. They sign in at `/login` with the join code (like `OWL-7K3Q2`) and their PIN. Five wrong PINs lock that profile for 15 minutes.
+- Progress follows each child across devices. Anyone can still try the app with no account.
+- Setup: run `supabase/schema.sql`, then in Supabase go to Authentication > URL Configuration and add your site URL (for local development `http://localhost:3000`) and `http://localhost:3000/dashboard` as a redirect URL. Email confirmation is on by default; you can turn it off under Authentication > Sign In / Providers > Email for quicker testing.
