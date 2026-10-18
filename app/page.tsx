@@ -1,69 +1,76 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useRouter } from "next/navigation";
+import { Ollie } from "@/components/Ollie";
+import { Button, Card, Chip, ChipGroup } from "@/components/ui";
+import { GOOD_AT, GRADES, LOVES, SUBJECTS } from "@/lib/options";
+import type { Option } from "@/lib/options";
+import { Loading } from "@/components/Loading";
+import { useStore } from "@/lib/store";
+
+export default function AboutMe() {
+  const router = useRouter();
+  const { ready, profile, updateProfile } = useStore();
+
+  const toggle = (list: string[], label: string) =>
+    list.includes(label) ? list.filter((l) => l !== label) : [...list, label];
+
+  const picks = (key: "subjects" | "loves" | "goodAt", options: Option[]) =>
+    options.map((o) => (
+      <Chip
+        key={o.label}
+        emoji={o.emoji}
+        selected={profile[key].includes(o.label)}
+        onClick={() => updateProfile({ [key]: toggle(profile[key], o.label) })}
+      >
+        {o.label}
+      </Chip>
+    ));
+
+  const canStart = profile.grade !== null && profile.subjects.length + profile.loves.length > 0;
+
+  if (!ready) return <Loading />;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="grid gap-6 md:grid-cols-[18rem_1fr]">
+      <aside className="flex flex-col items-center gap-4 text-center">
+        <Ollie size={160} />
+        <h1 className="text-3xl font-black text-violet-900">Hi! I&apos;m Ollie the owl</h1>
+        <p className="text-xl font-semibold">Tell me about you and I&apos;ll find jobs you&apos;d love!</p>
+      </aside>
+
+      <Card className="space-y-6">
+        <label className="block space-y-2">
+          <span className="text-xl font-extrabold text-violet-900">What should I call you?</span>
+          <input
+            value={profile.name}
+            onChange={(e) => updateProfile({ name: e.target.value.slice(0, 20) })}
+            placeholder="First name or a nickname"
+            autoComplete="off"
+            className="w-full rounded-2xl border-2 border-violet-200 px-4 py-3 text-xl focus:border-violet-500 focus:outline-none"
+          />
+        </label>
+
+        <ChipGroup title="I'm in grade">
+          {GRADES.map((g) => (
+            <Chip key={g} selected={profile.grade === g} onClick={() => updateProfile({ grade: g })}>
+              Grade {g}
+            </Chip>
+          ))}
+        </ChipGroup>
+        <ChipGroup title="I love at school">{picks("subjects", SUBJECTS)}</ChipGroup>
+        <ChipGroup title="I love to">{picks("loves", LOVES)}</ChipGroup>
+        <ChipGroup title="I'm good at">{picks("goodAt", GOOD_AT)}</ChipGroup>
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-base font-semibold text-slate-600">
+            {canStart ? "Great! Ready for the quiz?" : "Pick your grade and at least one thing you love."}
           </p>
+          <Button disabled={!canStart} onClick={() => router.push("/quiz")}>
+            Let&apos;s go! 🚀
+          </Button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </Card>
     </div>
   );
 }

@@ -1,36 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dream Jobs (Smart Career Planner)
 
-## Getting Started
+An AI career explorer for kids in Grades 4 to 6. Kids tap through a short "About me" and 5-question quiz, get career matches with simple explanations and what to study, see a grade-by-grade adventure map, compare jobs, chat with Ollie the owl, and save or share a one-page plan.
 
-First, run the development server:
+## Run it
 
 ```bash
+npm install
+cp .env.example .env.local   # optional, see below
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+It works with no keys: matching uses a built-in career catalog and Ollie gives simple canned replies.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `AI_GATEWAY_API_KEY` turns on AI-generated careers and the full Ollie chat (Vercel AI Gateway, default model `anthropic/claude-haiku-5-5`).
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (after running `supabase/schema.sql`) save answers and enable parent/teacher share links at `/plan/<id>`. The tables are locked by RLS and only reachable through three id-based functions, so the public key cannot list anyone's data.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Kid safety
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No logins or personal data: just a first name or nickname and an anonymous session id. Ollie's prompt keeps answers simple, on topic, and free of salary numbers or "you can't" language.
