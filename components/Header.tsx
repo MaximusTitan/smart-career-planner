@@ -23,15 +23,15 @@ const linkStyle = "rounded-full px-3 py-1 font-bold text-violet-700 hover:bg-vio
 export function Header() {
   return (
     <header className="border-b-2 border-violet-100 bg-white/80 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
         <Link href="/" aria-label="Smart Career Planner home">
           <Image src="/logo.png" alt="Smart Career Planner" width={1014} height={239} priority className="h-11 w-auto" />
         </Link>
+        <AccountMenu />
         {/* usePathname needs the URL, so it streams in behind Suspense */}
-        <Suspense fallback={<div className="h-8 w-80" aria-hidden />}>
+        <Suspense fallback={<div className="h-8 w-full" aria-hidden />}>
           <StepNav />
         </Suspense>
-        <AccountMenu />
       </div>
     </header>
   );
@@ -41,11 +41,11 @@ function StepNav() {
   const pathname = usePathname();
   const { status } = useAuth();
   // The steps are only for someone who is signed in.
-  if (status !== "user") return <div className="flex-1" />;
+  if (status !== "user") return null;
   const current = STEPS.findIndex((s) => s.href === pathname);
 
   return (
-    <nav aria-label="Steps" className="flex flex-wrap gap-1 text-sm font-bold">
+    <nav aria-label="Steps" className="flex w-full flex-wrap justify-center gap-1 text-sm font-bold">
       {STEPS.map((s, i) => (
         <Link
           key={s.href}
