@@ -4,9 +4,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from "react";
 import type { Career, Profile, SavedState } from "./types";
 import { useAuth } from "./auth";
-import { syncState } from "./sync";
+import { getBrowserSupabase } from "./supabase-browser";
+import { authHeaders } from "./auth-headers";
 import { EMPTY_PROFILE } from "./options";
-
 
 type Store = SavedState & {
   ready: boolean;
@@ -19,16 +19,10 @@ type Store = SavedState & {
   toggleCompare: (id: string) => void;
   toggleSaved: (id: string) => void;
   toggleMission: (mission: string) => void;
-  restart: () => void;
-  /** Replace this device's progress with a kid profile's saved data (after sign-in or "play as"). */
-  adopt: (data: Partial<SavedState>) => void;
 };
-
-const KEY = "dream-jobs-v1";
 
 function freshState(): SavedState {
   return {
-    sessionId: crypto.randomUUID(),
     profile: EMPTY_PROFILE,
     careers: [],
     selectedId: null,
@@ -41,9 +35,9 @@ function freshState(): SavedState {
 
 const noop = () => {};
 
-/** What pages see on the server and before the browser's saved state has loaded. */
+/** What pages see on the server and while the signed-in person's saved progress loads. */
 const PRE_READY: Store = {
-  ...{ sessionId: "", profile: EMPTY_PROFILE, careers: [], selectedId: null, compareIds: [], savedIds: [], doneMissions: [], source: null },
+  ...{ profile: EMPTY_PROFILE, careers: [], selectedId: null, compareIds: [], savedIds: [], doneMissions: [], source: null },
   ready: false,
   loading: false,
   error: null,
@@ -54,8 +48,6 @@ const PRE_READY: Store = {
   toggleCompare: noop,
   toggleSaved: noop,
   toggleMission: noop,
-  restart: noop,
-  adopt: noop,
 };
 
 const Ctx = createContext<Store>(PRE_READY);
@@ -68,40 +60,57 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<SavedState | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const syncTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const auth = useAuth();
-  const target = useRef({ kid: auth.kid, playing: auth.playing, adultSignedIn: auth.adult !== null });
-  useEffect(() => {
-    target.current = { kid: auth.kid, playing: auth.playing, adultSignedIn: auth.adult !== null };
-  }, [auth.kid, auth.playing, auth.adult]);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // The person whose saved progress has loaded. We only save for them, so a failed load
+  // can never overwrite their real progress with an empty one.
+  const loadedFor = useRef<string | null>(null);
+  const { status, user } = useAuth();
+  const userId = user?.id ?? null;
+  const userName = user?.name ?? "";
 
-  // Load the saved state in the browser after first paint (keeps server and client HTML identical).
+  // When someone signs in, load their saved progress. When they sign out, start fresh.
   useEffect(() => {
-    let loaded: SavedState | null = null;
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) loaded = { ...freshState(), ...JSON.parse(raw) };
-    } catch {
-      // storage can be blocked; we just start fresh
+    if (status === "loading") return;
+    loadedFor.current = null;
+    const supabase = getBrowserSupabase();
+    if (!userId || !supabase) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setState(freshState());
+      return;
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(loaded ?? freshState());
-  }, []);
 
-  // Save locally on every change, and to Supabase a moment after the last change.
+    setState(null);
+    let cancelled = false;
+    supabase
+      .from("progress")
+      .select("data")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data, error: loadError }) => {
+        if (cancelled) return;
+        const saved = (data?.data ?? {}) as Partial<SavedState>;
+        const next = { ...freshState(), ...saved };
+        if (!next.profile.name) next.profile = { ...next.profile, name: userName };
+        setState(next);
+        if (loadError) setError("Could not load your saved progress. Please refresh.");
+        else loadedFor.current = userId;
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [status, userId, userName]);
+
+  // Save a moment after the last change.
   useEffect(() => {
-    if (!state) return;
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      // ignore
-    }
-    clearTimeout(syncTimer.current);
-    syncTimer.current = setTimeout(() => {
-      syncState(target.current, state).catch(() => {});
-    }, 1500);
-    return () => clearTimeout(syncTimer.current);
-  }, [state]);
+    if (!state || !userId || loadedFor.current !== userId) return;
+    saveTimer.current = setTimeout(() => {
+      getBrowserSupabase()
+        ?.from("progress")
+        .upsert({ user_id: userId, data: state, updated_at: new Date().toISOString() })
+        .then(() => {});
+    }, 1000);
+    return () => clearTimeout(saveTimer.current);
+  }, [state, userId]);
 
   const patch = useCallback((p: Partial<SavedState>) => {
     setState((s) => (s ? { ...s, ...p } : s));
@@ -124,9 +133,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         try {
           const res = await fetch("/api/careers", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...(await authHeaders()) },
             body: JSON.stringify(state.profile),
           });
+          if (res.status === 401) {
+            setError("Please sign out and sign in again.");
+            return false;
+          }
           if (!res.ok) throw new Error("Request failed");
           const data = (await res.json()) as { careers: Career[]; source: "ai" | "offline" };
           patch({
@@ -147,8 +160,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleCompare: (id) => patch({ compareIds: toggle(state.compareIds, id, 2) }),
       toggleSaved: (id) => patch({ savedIds: toggle(state.savedIds, id) }),
       toggleMission: (m) => patch({ doneMissions: toggle(state.doneMissions, m) }),
-      restart: () => patch({ ...freshState() }),
-      adopt: (data) => setState((s) => ({ ...freshState(), ...data, sessionId: s?.sessionId ?? crypto.randomUUID() })),
     };
   }, [state, loading, error, patch]);
 

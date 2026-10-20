@@ -1,3 +1,4 @@
+import { isSignedIn, unauthorized } from "@/lib/api-auth";
 import { streamText } from "ai";
 import { z } from "zod";
 import { aiConfigured, KID_RULES, MODEL, profileSummary } from "@/lib/ai";
@@ -28,6 +29,7 @@ function offlineReply(question: string, careers: string[]) {
 }
 
 export async function POST(request: Request) {
+  if (!(await isSignedIn(request))) return unauthorized();
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return new Response("Bad request", { status: 400 });

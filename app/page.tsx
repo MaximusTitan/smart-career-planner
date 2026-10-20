@@ -51,13 +51,21 @@ export default function AboutMe() {
           />
         </label>
 
-        <ChipGroup title="I'm in grade">
-          {GRADES.map((g) => (
-            <Chip key={g} selected={profile.grade === g} onClick={() => updateProfile({ grade: g })}>
-              Grade {g}
-            </Chip>
-          ))}
-        </ChipGroup>
+        <label className="block space-y-2">
+          <span className="block text-xl font-extrabold text-violet-900">I&apos;m in grade</span>
+          <select
+            value={profile.grade ?? ""}
+            onChange={(e) => updateProfile({ grade: e.target.value ? Number(e.target.value) : null })}
+            className="w-full rounded-2xl border-2 border-violet-200 bg-white px-4 py-3 text-xl font-bold focus:border-violet-500 focus:outline-none sm:w-64"
+          >
+            <option value="">Pick your grade</option>
+            {GRADES.map((g) => (
+              <option key={g} value={g}>
+                Grade {g}
+              </option>
+            ))}
+          </select>
+        </label>
         <ChipGroup title="I love at school">{picks("subjects", SUBJECTS)}</ChipGroup>
         <ChipGroup title="I love to">{picks("loves", LOVES)}</ChipGroup>
         <ChipGroup title="I'm good at">{picks("goodAt", GOOD_AT)}</ChipGroup>

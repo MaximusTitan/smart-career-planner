@@ -24,7 +24,7 @@ export function FormError({ children }: { children: React.ReactNode }) {
 export function AccountsOff() {
   return (
     <p className="rounded-2xl bg-amber-100 p-4 text-lg font-bold text-amber-950">
-      Accounts aren&apos;t switched on yet. You can still use Smart Career Planner without signing in.
+      Accounts aren&apos;t switched on yet, so nobody can sign in. Ask whoever set up the app to add the Supabase keys.
     </p>
   );
 }

@@ -4,9 +4,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 let client: SupabaseClient | null | undefined;
 
 /**
- * Browser Supabase client (publishable key). Used for adult sign-up/sign-in
- * (the session lives in the browser) and for kid sign-in / saving through the
- * RPC functions in supabase/schema.sql. Returns null when env vars are missing.
+ * Browser Supabase client (publishable key). Handles sign-up and sign-in (the session
+ * lives in the browser) and saves each person's own progress row, which Row Level
+ * Security limits to its owner. Returns null when env vars are missing.
  */
 export function getBrowserSupabase(): SupabaseClient | null {
   if (client !== undefined) return client;

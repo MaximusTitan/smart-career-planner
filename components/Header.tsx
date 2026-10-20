@@ -1,11 +1,10 @@
 "use client";
 
 import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Ollie } from "./Ollie";
 import { useAuth } from "@/lib/auth";
-import { useStore } from "@/lib/store";
 
 const STEPS = [
   { href: "/", label: "About me" },
@@ -17,15 +16,16 @@ const STEPS = [
   { href: "/plan", label: "My plan" },
 ];
 
+const SAVED = { href: "/saved", label: "⚡ Saved plans" };
+
 const linkStyle = "rounded-full px-3 py-1 font-bold text-violet-700 hover:bg-violet-100";
 
 export function Header() {
   return (
     <header className="border-b-2 border-violet-100 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-xl font-black text-violet-800 sm:text-2xl">
-          <Ollie size={40} />
-          Smart Career Planner
+        <Link href="/" aria-label="Smart Career Planner home">
+          <Image src="/logo.png" alt="Smart Career Planner" width={1014} height={239} priority className="h-11 w-auto" />
         </Link>
         {/* usePathname needs the URL, so it streams in behind Suspense */}
         <Suspense fallback={<div className="h-8 w-80" aria-hidden />}>
@@ -33,13 +33,15 @@ export function Header() {
         </Suspense>
         <AccountMenu />
       </div>
-      <PlayingBanner />
     </header>
   );
 }
 
 function StepNav() {
   const pathname = usePathname();
+  const { status } = useAuth();
+  // The steps are only for someone who is signed in.
+  if (status !== "user") return <div className="flex-1" />;
   const current = STEPS.findIndex((s) => s.href === pathname);
 
   return (
@@ -56,41 +58,36 @@ function StepNav() {
           {i + 1}. {s.label}
         </Link>
       ))}
+      <Link
+        href={SAVED.href}
+        aria-current={pathname === SAVED.href ? "page" : undefined}
+        className={`rounded-full px-3 py-1 ${
+          pathname === SAVED.href ? "bg-violet-600 text-white" : "text-violet-700 hover:bg-violet-100"
+        }`}
+      >
+        {SAVED.label}
+      </Link>
     </nav>
   );
 }
 
 function AccountMenu() {
   const router = useRouter();
-  const { status, available, adult, kid, signOut } = useAuth();
-  const { restart } = useStore();
+  const { status, available, user, signOut } = useAuth();
 
   if (!available || status === "loading") return null;
 
-  async function leave() {
-    await signOut();
-    restart(); // never leave one person's progress on a shared device
-    router.push("/");
-  }
-
-  if (status === "kid" && kid) {
+  if (user) {
     return (
       <div className="flex items-center gap-2 text-base">
-        <span className="font-extrabold text-violet-900">Hi {kid.nickname}! 👋</span>
-        <button onClick={leave} className={linkStyle}>
-          Sign out
-        </button>
-      </div>
-    );
-  }
-
-  if (status === "adult" && adult) {
-    return (
-      <div className="flex items-center gap-1 text-base">
-        <Link href="/dashboard" className={linkStyle}>
-          👨‍👩‍👧 Dashboard
-        </Link>
-        <button onClick={leave} className={linkStyle}>
+        <span className="font-extrabold text-violet-900">Hi {user.name || "there"}! 👋</span>
+        <button
+          onClick={async () => {
+            await signOut();
+            router.push("/login");
+          }}
+          className={linkStyle}
+        >
           Sign out
         </button>
       </div>
@@ -105,28 +102,6 @@ function AccountMenu() {
       <Link href="/signup" className="rounded-full bg-orange-500 px-4 py-1 font-extrabold text-white hover:bg-orange-400">
         Sign up
       </Link>
-    </div>
-  );
-}
-
-function PlayingBanner() {
-  const router = useRouter();
-  const { playing, playAs } = useAuth();
-  const { restart } = useStore();
-  if (!playing) return null;
-  return (
-    <div className="no-print bg-amber-100 py-1 text-center text-base font-bold text-amber-950">
-      Playing as {playing.nickname} 🎮{" "}
-      <button
-        className="ml-2 underline"
-        onClick={() => {
-          playAs(null);
-          restart();
-          router.push("/dashboard");
-        }}
-      >
-        Back to dashboard
-      </button>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Ollie } from "./Ollie";
+import { authHeaders } from "@/lib/auth-headers";
 import { useStore } from "@/lib/store";
 import type { ChatMessage } from "@/lib/types";
 
@@ -33,7 +34,7 @@ export function ChatWidget() {
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await authHeaders()) },
         body: JSON.stringify({
           messages: next,
           profile,

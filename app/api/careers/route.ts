@@ -1,3 +1,4 @@
+import { isSignedIn, unauthorized } from "@/lib/api-auth";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { aiConfigured, KID_RULES, MODEL, profileSummary } from "@/lib/ai";
@@ -85,6 +86,7 @@ ${summary}`,
 }
 
 export async function POST(request: Request) {
+  if (!(await isSignedIn(request))) return unauthorized();
   const parsed = profileSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return Response.json({ error: "Bad request" }, { status: 400 });

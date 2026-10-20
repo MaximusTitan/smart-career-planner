@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { NeedJobs } from "@/components/NeedJobs";
 import { Button, Card } from "@/components/ui";
 import { Loading } from "@/components/Loading";
+import { authHeaders } from "@/lib/auth-headers";
 import { useStore } from "@/lib/store";
 
 export default function MyPlan() {
@@ -23,7 +24,7 @@ export default function MyPlan() {
     try {
       const res = await fetch("/api/plan", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await authHeaders()) },
         body: JSON.stringify({
           name: profile.name,
           grade: profile.grade,

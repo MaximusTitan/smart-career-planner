@@ -1,3 +1,4 @@
+import { isSignedIn, unauthorized } from "@/lib/api-auth";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { getSupabase } from "@/lib/supabase";
@@ -11,8 +12,9 @@ const planSchema = z.object({
   missions: z.array(z.string().max(120)).max(5),
 });
 
-// Creates a read-only plan that parents and teachers can open from a link.
+// Creates a read-only plan that family or teachers can open from a private link.
 export async function POST(request: Request) {
+  if (!(await isSignedIn(request))) return unauthorized();
   const supabase = getSupabase();
   if (!supabase) return Response.json({ id: null });
 

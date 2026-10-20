@@ -26,7 +26,7 @@ export const GOOD_AT: Option[] = [
   { label: "Talking", emoji: "🗣️", tags: ["talking", "people"] },
 ];
 
-export const GRADES = [4, 5, 6];
+export const GRADES = [4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 export type QuizQuestion = { question: string; options: Option[] };
 

@@ -29,7 +29,7 @@ export default function AdventureMap() {
 
       <ol className="grid gap-4 md:grid-cols-4">
         {selected.roadmap.map((stage, i) => {
-          const current = profile.grade !== null && stage.grade === `Grade ${profile.grade}`;
+          const current = profile.grade !== null && stage.grade === (profile.grade >= 7 ? "Grade 7+" : `Grade ${profile.grade}`);
           return (
             <li key={stage.grade} className="relative">
               <Card className={`h-full space-y-3 ${current ? "border-orange-400 ring-4 ring-orange-200" : ""}`}>

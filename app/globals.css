@@ -2,6 +2,25 @@
 
 @theme inline {
   --font-sans: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+
+  /* Brand colours from the logo: pink #ee3b74, orange #f8a046, green #4bbd8a, blue #37c4f0, yellow #ffc145.
+     The app's main accent (the "violet-*" classes) is the logo pink. */
+  --color-violet-50: #fff1f5;
+  --color-violet-100: #ffe0e9;
+  --color-violet-200: #ffc2d4;
+  --color-violet-300: #ff94b3;
+  --color-violet-400: #f86a93;
+  --color-violet-500: #ee3b74;
+  --color-violet-600: #d92a64;
+  --color-violet-700: #b81f52;
+  --color-violet-800: #8f1a43;
+  --color-violet-900: #6e1636;
+  --color-violet-950: #45091f;
+
+  --color-brand-orange: #f8a046;
+  --color-brand-green: #4bbd8a;
+  --color-brand-blue: #37c4f0;
+  --color-brand-yellow: #ffc145;
 }
 
 :root {

@@ -13,7 +13,7 @@ npm run dev
 It works with no keys: matching uses a built-in career catalog and Ollie gives simple canned replies.
 
 - `AI_GATEWAY_API_KEY` turns on AI-generated careers and the full Ollie chat (Vercel AI Gateway, default model `anthropic/claude-haiku-5-5`).
-- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (after running `supabase/schema.sql`) save answers and enable parent/teacher share links at `/plan/<id>`. The tables are locked by RLS and only reachable through three id-based functions, so the public key cannot list anyone's data.
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (after running `supabase/schema.sql`) save answers and enable accounts, saved progress and private share links at `/plan/<id>`. Tables are locked by Row Level Security, so the public key cannot read anyone else's data.
 
 ## Kid safety
 
@@ -21,7 +21,10 @@ No logins or personal data: just a first name or nickname and an anonymous sessi
 
 ## Accounts
 
-- **Parents and teachers** sign up at `/signup` (Supabase Auth, email + password) and manage kids at `/dashboard`: add a child with a nickname and a 4-number PIN, see their interests, job ideas and mission progress, play as them, change their PIN, or remove them.
-- **Students** never need an email. They sign in at `/login` with the join code (like `OWL-7K3Q2`) and their PIN. Five wrong PINs lock that profile for 15 minutes.
-- Progress follows each child across devices. Anyone can still try the app with no account.
-- Setup: run `supabase/schema.sql`, then in Supabase go to Authentication > URL Configuration and add your site URL (for local development `http://localhost:3000`) and `http://localhost:3000/dashboard` as a redirect URL. Email confirmation is on by default; you can turn it off under Authentication > Sign In / Providers > Email for quicker testing.
+One simple login for everyone: sign up at `/signup` and sign in at `/login` with an email and password (Supabase Auth). There are no separate student, parent or teacher accounts.
+
+- **Everyone must sign in to use the app.** Signed-out visitors are sent to `/login`, and the AI and plan API routes return 401 without a valid login.
+- Each person's answers, job ideas and plan are saved to their own account and follow them across devices. Row Level Security means nobody can read anyone else's progress.
+- The only public page is a read-only shared plan (`/plan/<id>`), opened from a private link the person chooses to send.
+- Younger children should sign up with a grown-up's help.
+- Setup: run `supabase/schema.sql`, then in Supabase go to Authentication > URL Configuration and add your site URL (for local development `http://localhost:3000`) as a redirect URL. Email confirmation is on by default; you can turn it off under Authentication > Sign In / Providers > Email for quicker testing.
