@@ -209,6 +209,13 @@ function toCareer(e: Entry, fit: Fit, matched: string[]): Career {
   };
 }
 
+/** A stable, answer-dependent order for careers that score the same, so no one career always wins ties. */
+function tieBreak(id: string, tags: string[]) {
+  let h = 0;
+  for (const ch of id + tags.join(",")) h = (h * 31 + ch.charCodeAt(0)) | 0;
+  return h;
+}
+
 /** Offline fallback: score careers by shared interests. Used when no AI key is set. */
 export function matchCareers(profile: Profile, count = 8): Career[] {
   const tags = profileTags(profile);
@@ -216,7 +223,7 @@ export function matchCareers(profile: Profile, count = 8): Career[] {
     const score = tags.filter((t) => e.tags.includes(t)).length;
     const matched = [...new Set(tags.filter((t) => e.tags.includes(t)))];
     return { e, score, matched };
-  }).sort((a, b) => b.score - a.score);
+  }).sort((a, b) => b.score - a.score || tieBreak(a.e.id, tags) - tieBreak(b.e.id, tags));
   const top = scored[0]?.score || 1;
   return scored.slice(0, count).map(({ e, score, matched }) => {
     const ratio = score / top;

@@ -43,5 +43,7 @@ export type SavedState = {
   compareIds: string[];
   savedIds: string[];
   doneMissions: string[];
+  /** Fingerprint of the answers the careers were picked for, so stale jobs can be flagged. */
+  careersFor?: string;
   source: "ai" | "offline" | null;
 };

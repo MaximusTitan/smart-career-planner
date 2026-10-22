@@ -106,6 +106,19 @@ export function profileLabels(p: Profile): string[] {
   ];
 }
 
+/** A fingerprint of everything that shapes the job matches (not the name). */
+export function profileKey(p: Profile): string {
+  const sorted = (l: string[]) => [...l].sort();
+  return JSON.stringify([
+    p.grade,
+    sorted(p.subjects),
+    sorted(p.loves),
+    sorted(p.goodAt),
+    QUIZ.map((_, i) => p.quiz[i] ?? ""),
+    p.extra.trim(),
+  ]);
+}
+
 export const EMPTY_PROFILE: Profile = {
   name: "",
   grade: null,

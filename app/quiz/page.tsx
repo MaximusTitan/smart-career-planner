@@ -16,10 +16,8 @@ export default function Quiz() {
 function QuizSteps() {
   const router = useRouter();
   const { profile, updateProfile, findJobs, loading, error } = useStore();
-  const [step, setStep] = useState(() => {
-    const firstOpen = QUIZ.findIndex((_, i) => !profile.quiz[i]);
-    return firstOpen === -1 ? QUIZ.length - 1 : firstOpen;
-  });
+  // Always start at question 1 so saved answers are visible and can be changed.
+  const [step, setStep] = useState(0);
 
   const q = QUIZ[step];
   const isLast = step === QUIZ.length - 1;
@@ -60,7 +58,9 @@ function QuizSteps() {
         <Ollie size={72} />
         <h1 className="text-3xl font-black text-violet-950">{q.question}</h1>
       </div>
-      <p className="text-lg font-bold text-slate-600">Tap your favourite!</p>
+      <p className="text-lg font-bold text-slate-600">
+        {picked ? "Your earlier pick is highlighted. Tap another to change it." : "Tap your favourite!"}
+      </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         {q.options.map((o) => {

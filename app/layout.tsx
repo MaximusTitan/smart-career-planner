@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import { StoreProvider } from "@/lib/store";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { AuthGate } from "@/components/AuthGate";
 import { Loading } from "@/components/Loading";
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <AuthGate>{children}</AuthGate>
               </Suspense>
             </main>
+            <Footer />
           </StoreProvider>
         </AuthProvider>
       </body>

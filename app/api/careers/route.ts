@@ -20,8 +20,8 @@ const listSchema = z.object({
   careers: z
     .array(
       z.object({
-        id: z.string().describe("short kebab-case id, e.g. game-maker"),
-        title: z.string().describe("job name a child knows, e.g. Game Maker"),
+        id: z.string().describe("short kebab-case id made from the title"),
+        title: z.string().describe("a job name a young person knows"),
         emoji: z.string().describe("one emoji"),
         tagline: z.string().describe("one short line, max 8 words"),
         whyFit: z.string().describe("one sentence starting with 'You love', linking this child's interests to the job"),
@@ -59,8 +59,10 @@ async function generateCareers(profile: Profile): Promise<Career[]> {
     model: MODEL,
     output: Output.object({ schema: listSchema }),
     system: KID_RULES,
-    prompt: `Suggest 6 careers that match this child's interests, best match first.
-Mix well-known jobs with a surprising one. Never more than 8. Write in simple words for a 9-year-old.
+    prompt: `Suggest 6 careers for this student, best match first.
+Rank by how many of their picks a career uses: the themes that show up most often across their answers decide the top spots.
+Give variety: cover at least three different kinds of work, never two versions of the same job, and include one surprising idea.
+Use simple words that suit their grade.
 
 ${summary}`,
   });
@@ -71,7 +73,7 @@ ${summary}`,
         model: MODEL,
         output: Output.object({ schema: detailSchema }),
         system: KID_RULES,
-        prompt: `Write the details for the career "${c.title}" for this child. Use simple words a 9-year-old understands.
+        prompt: `Write the details for the career "${c.title}" for this student. Use simple words that suit their grade.
 The four roadmap stages are Grade 4, Grade 5, Grade 6 and Grade 7+, each with a fun thing to try and a small mission.
 
 ${summary}`,

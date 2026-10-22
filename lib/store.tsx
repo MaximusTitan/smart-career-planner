@@ -6,7 +6,7 @@ import type { Career, Profile, SavedState } from "./types";
 import { useAuth } from "./auth";
 import { getBrowserSupabase } from "./supabase-browser";
 import { authHeaders } from "./auth-headers";
-import { EMPTY_PROFILE } from "./options";
+import { EMPTY_PROFILE, profileKey } from "./options";
 
 type Store = SavedState & {
   ready: boolean;
@@ -147,6 +147,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             source: data.source,
             selectedId: data.careers[0]?.id ?? null,
             compareIds: [],
+            careersFor: profileKey(state.profile),
           });
           return true;
         } catch {

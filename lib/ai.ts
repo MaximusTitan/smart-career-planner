@@ -1,5 +1,5 @@
 import type { Career, Profile } from "./types";
-import { profileLabels } from "./options";
+import { QUIZ } from "./options";
 
 /** Plain "provider/model" strings route through the Vercel AI Gateway. */
 export const MODEL = process.env.AI_MODEL || "anthropic/claude-haiku-5-5";
@@ -22,13 +22,19 @@ export const KID_RULES = `You are Ollie the owl, a friendly career helper for ch
 - Keep it safe, kind and age-appropriate.`;
 
 export function profileSummary(p: Profile) {
-  const parts = [
+  const list = (items: string[]) => (items.length ? items.join(", ") : "none picked");
+  const quiz = QUIZ.flatMap((q, i) => (p.quiz[i] ? [`- ${q.question} ${p.quiz[i]}`] : []));
+  return [
     p.name && `Name: ${p.name.slice(0, 30)}`,
     p.grade && `Grade: ${p.grade}`,
-    `Interests: ${profileLabels(p).join(", ") || "not shared yet"}`,
+    `Likes at school: ${list(p.subjects)}`,
+    `Loves to do: ${list(p.loves)}`,
+    `Good at: ${list(p.goodAt)}`,
+    quiz.length > 0 && `Quiz answers:\n${quiz.join("\n")}`,
     p.extra && `Also loves: ${p.extra.slice(0, 200)}`,
-  ].filter(Boolean);
-  return parts.join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export function careerTitles(careers: Career[]) {

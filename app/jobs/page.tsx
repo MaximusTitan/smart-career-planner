@@ -5,17 +5,21 @@ import { useRouter } from "next/navigation";
 import { NeedJobs } from "@/components/NeedJobs";
 import { Button, ButtonLink, FIT_LABEL, FIT_STYLE } from "@/components/ui";
 import { Loading } from "@/components/Loading";
+import { profileKey } from "@/lib/options";
 import { useStore } from "@/lib/store";
 
 export default function Jobs() {
   const router = useRouter();
-  const { ready, careers, profile, select, compareIds, toggleCompare, savedIds } = useStore();
+  const { ready, careers, careersFor, profile, select, compareIds, toggleCompare, savedIds, findJobs, loading, error } =
+    useStore();
   const [showAll, setShowAll] = useState(false);
 
   if (!ready) return <Loading />;
   if (careers.length === 0) return <NeedJobs />;
 
   const shown = showAll ? careers : careers.slice(0, 5);
+  // These jobs were picked for older answers: offer a refresh instead of showing them as if current.
+  const stale = careersFor !== undefined && careersFor !== profileKey(profile);
 
   return (
     <div className="space-y-6">
@@ -32,6 +36,22 @@ export default function Jobs() {
           ⚖️ Compare jobs {compareIds.length > 0 && `(${compareIds.length}/2)`}
         </ButtonLink>
       </div>
+
+      {stale && (
+        <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-amber-100 p-4">
+          <p className="text-lg font-bold text-amber-900">
+            You changed your answers, so these jobs are from before. Want fresh ones?
+          </p>
+          <Button onClick={() => findJobs()} disabled={loading}>
+            {loading ? "Ollie is thinking…" : "Update my jobs ✨"}
+          </Button>
+        </div>
+      )}
+      {error && (
+        <p role="alert" className="rounded-2xl bg-red-100 p-3 text-lg font-bold text-red-800">
+          {error}
+        </p>
+      )}
 
       <ul className="space-y-3">
         {shown.map((c) => {

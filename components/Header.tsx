@@ -23,16 +23,16 @@ const linkStyle = "rounded-full px-3 py-1 font-bold text-violet-700 hover:bg-vio
 export function Header() {
   return (
     <header className="border-b-2 border-violet-100 bg-white/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" aria-label="Smart Career Planner home">
           <Image src="/logo.png" alt="Smart Career Planner" width={1014} height={239} priority className="h-11 w-auto" />
         </Link>
         <AccountMenu />
-        {/* usePathname needs the URL, so it streams in behind Suspense */}
-        <Suspense fallback={<div className="h-8 w-full" aria-hidden />}>
-          <StepNav />
-        </Suspense>
       </div>
+      {/* usePathname needs the URL, so it streams in behind Suspense */}
+      <Suspense fallback={null}>
+        <StepNav />
+      </Suspense>
     </header>
   );
 }
@@ -44,30 +44,25 @@ function StepNav() {
   if (status !== "user") return null;
   const current = STEPS.findIndex((s) => s.href === pathname);
 
+  const pill = (active: boolean) =>
+    `shrink-0 rounded-full px-3 py-1 ${active ? "bg-violet-600 text-white" : "text-violet-700 hover:bg-violet-100"}`;
+
   return (
-    <nav aria-label="Steps" className="flex w-full flex-wrap justify-center gap-1 text-sm font-bold">
-      {STEPS.map((s, i) => (
-        <Link
-          key={s.href}
-          href={s.href}
-          aria-current={i === current ? "step" : undefined}
-          className={`rounded-full px-3 py-1 ${
-            i === current ? "bg-violet-600 text-white" : "text-violet-700 hover:bg-violet-100"
-          }`}
-        >
-          {i + 1}. {s.label}
-        </Link>
-      ))}
-      <Link
-        href={SAVED.href}
-        aria-current={pathname === SAVED.href ? "page" : undefined}
-        className={`rounded-full px-3 py-1 ${
-          pathname === SAVED.href ? "bg-violet-600 text-white" : "text-violet-700 hover:bg-violet-100"
-        }`}
+    <div className="border-t-2 border-violet-100 bg-violet-50/70">
+      <nav
+        aria-label="Steps"
+        className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 py-2 text-sm font-bold sm:justify-center"
       >
-        {SAVED.label}
-      </Link>
-    </nav>
+        {STEPS.map((s, i) => (
+          <Link key={s.href} href={s.href} aria-current={i === current ? "step" : undefined} className={pill(i === current)}>
+            {i + 1}. {s.label}
+          </Link>
+        ))}
+        <Link href={SAVED.href} aria-current={pathname === SAVED.href ? "page" : undefined} className={pill(pathname === SAVED.href)}>
+          {SAVED.label}
+        </Link>
+      </nav>
+    </div>
   );
 }
 
