@@ -21,7 +21,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const { status } = useAuth();
 
   const open = isPublic(path);
-  const needsLogin = !open && status === "anon";
+  // The home page doubles as the public landing page for signed-out visitors.
+  const needsLogin = !open && path !== "/" && status === "anon";
 
   useEffect(() => {
     if (needsLogin) router.replace("/login");
@@ -33,7 +34,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
-      <ChatWidget />
+      {status === "user" && <ChatWidget />}
     </>
   );
 }

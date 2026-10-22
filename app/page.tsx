@@ -7,8 +7,16 @@ import { GOOD_AT, GRADES, LOVES, SUBJECTS } from "@/lib/options";
 import type { Option } from "@/lib/options";
 import { Loading } from "@/components/Loading";
 import { useStore } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
+import { Landing } from "@/components/Landing";
 
-export default function AboutMe() {
+/** Signed-out visitors see the landing page; signed-in students start with the profile step. */
+export default function Home() {
+  const { status } = useAuth();
+  return status === "anon" ? <Landing /> : <AboutMe />;
+}
+
+function AboutMe() {
   const router = useRouter();
   const { ready, profile, updateProfile } = useStore();
 
