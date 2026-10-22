@@ -71,7 +71,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-violet-100 py-4 text-center text-sm font-semibold text-slate-500">
-        © {new Date().getFullYear()} Smart Career Planner · Made with 💛 for curious kids
+        © Smart Career Planner · Made with 💛 for curious kids
       </div>
     </footer>
   );
