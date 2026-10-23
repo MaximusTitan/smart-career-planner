@@ -45,6 +45,11 @@ export function Footer() {
                     Saved plans
                   </Link>
                 </li>
+                <li>
+                  <Link href="/feedback" className={linkClass}>
+                    Send feedback
+                  </Link>
+                </li>
               </>
             ) : (
               <>

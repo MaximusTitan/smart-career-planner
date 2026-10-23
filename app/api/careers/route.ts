@@ -13,6 +13,10 @@ const profileSchema = z.object({
   goodAt: z.array(z.string().max(40)).max(12),
   quiz: z.record(z.string(), z.string().max(60)),
   extra: z.string().max(300),
+  otherSubject: z.string().max(40).optional(),
+  otherLove: z.string().max(40).optional(),
+  otherGoodAt: z.string().max(40).optional(),
+  quizOther: z.record(z.string(), z.string().max(40)).optional(),
 });
 
 // Step 1 (fast): which careers fit, with the short text shown on the Jobs screen.

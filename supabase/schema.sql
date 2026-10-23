@@ -88,3 +88,25 @@ drop function if exists set_kid_pin(uuid, text);
 drop function if exists create_kid(text, int, text, jsonb);
 drop function if exists make_join_code();
 drop table if exists kids;
+
+-- =====================================================================
+-- Feedback: signed-in people send a rating and an optional note.
+-- They can add rows for themselves but can never read anyone's feedback
+-- (read it in the Supabase dashboard: Table editor > feedback).
+-- =====================================================================
+
+create table if not exists feedback (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  rating int not null check (rating between 1 and 5),
+  topic text check (topic is null or topic in ('jobs', 'quiz', 'ollie', 'look', 'bug', 'idea')),
+  message text not null default '' check (length(message) <= 1000),
+  created_at timestamptz not null default now()
+);
+
+alter table feedback enable row level security;
+
+drop policy if exists "people send their own feedback" on feedback;
+create policy "people send their own feedback" on feedback
+  for insert to authenticated
+  with check (user_id = auth.uid());

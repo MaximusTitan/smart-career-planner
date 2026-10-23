@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import type { ReactNode } from "react";import { useRouter } from "next/navigation";
 import { Ollie } from "@/components/Ollie";
 import { Button, Card, Chip, ChipGroup } from "@/components/ui";
 import { GOOD_AT, GRADES, LOVES, SUBJECTS } from "@/lib/options";
@@ -35,7 +36,8 @@ function AboutMe() {
       </Chip>
     ));
 
-  const canStart = profile.grade !== null && profile.subjects.length + profile.loves.length > 0;
+  const canStart = profile.grade !== null && 
+    profile.subjects.length + profile.loves.length + (profile.otherSubject?.trim() ? 1 : 0) + (profile.otherLove?.trim() ? 1 : 0) > 0;
 
   if (!ready) return <Loading />;
 
@@ -74,9 +76,33 @@ function AboutMe() {
             ))}
           </select>
         </label>
-        <ChipGroup title="I love at school">{picks("subjects", SUBJECTS)}</ChipGroup>
-        <ChipGroup title="I love to">{picks("loves", LOVES)}</ChipGroup>
-        <ChipGroup title="I'm good at">{picks("goodAt", GOOD_AT)}</ChipGroup>
+        <ChipsWithOther
+          title="I love at school"
+          question="What else do you love at school?"
+          placeholder="Like Drama, Cooking, Languages…"
+          value={profile.otherSubject ?? ""}
+          onChange={(v) => updateProfile({ otherSubject: v })}
+        >
+          {picks("subjects", SUBJECTS)}
+        </ChipsWithOther>
+        <ChipsWithOther
+          title="I love to"
+          question="What else do you love to do?"
+          placeholder="Like Cook, Dance, Skateboard…"
+          value={profile.otherLove ?? ""}
+          onChange={(v) => updateProfile({ otherLove: v })}
+        >
+          {picks("loves", LOVES)}
+        </ChipsWithOther>
+        <ChipsWithOther
+          title="I'm good at"
+          question="What else are you good at?"
+          placeholder="Like Drawing, Cooking, Helping friends…"
+          value={profile.otherGoodAt ?? ""}
+          onChange={(v) => updateProfile({ otherGoodAt: v })}
+        >
+          {picks("goodAt", GOOD_AT)}
+        </ChipsWithOther>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-base font-semibold text-slate-600">
@@ -87,6 +113,57 @@ function AboutMe() {
           </Button>
         </div>
       </Card>
+    </div>
+  );
+}
+
+/** A group of chips plus an "Other" chip that opens a box for the student's own words. */
+function ChipsWithOther({
+  title,
+  question,
+  placeholder,
+  value,
+  onChange,
+  children,
+}: {
+  title: string;
+  question: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const on = open || Boolean(value.trim());
+
+  return (
+    <div className="space-y-4">
+      <ChipGroup title={title}>
+        {children}
+        <Chip
+          emoji="✍️"
+          selected={on}
+          onClick={() => {
+            if (on) onChange("");
+            setOpen(!on);
+          }}
+        >
+          Other
+        </Chip>
+      </ChipGroup>
+      {on && (
+        <label className="block space-y-2">
+          <span className="text-lg font-extrabold text-violet-900">{question}</span>
+          <input
+            value={value}
+            onChange={(e) => onChange(e.target.value.slice(0, 40))}
+            placeholder={placeholder}
+            autoComplete="off"
+            autoFocus
+            className="w-full rounded-2xl border-2 border-violet-200 px-4 py-3 text-xl focus:border-violet-500 focus:outline-none"
+          />
+        </label>
+      )}
     </div>
   );
 }

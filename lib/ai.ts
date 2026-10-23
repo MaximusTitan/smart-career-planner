@@ -1,5 +1,5 @@
 import type { Career, Profile } from "./types";
-import { QUIZ } from "./options";
+import { QUIZ, quizAnswerText } from "./options";
 
 /** Plain "provider/model" strings route through the Vercel AI Gateway. */
 export const MODEL = process.env.AI_MODEL || "anthropic/claude-haiku-5-5";
@@ -23,13 +23,13 @@ export const KID_RULES = `You are Ollie the owl, a friendly career helper for ch
 
 export function profileSummary(p: Profile) {
   const list = (items: string[]) => (items.length ? items.join(", ") : "none picked");
-  const quiz = QUIZ.flatMap((q, i) => (p.quiz[i] ? [`- ${q.question} ${p.quiz[i]}`] : []));
+  const quiz = QUIZ.flatMap((q, i) => (quizAnswerText(p, i) ? [`- ${q.question} ${quizAnswerText(p, i)}`] : []));
   return [
     p.name && `Name: ${p.name.slice(0, 30)}`,
     p.grade && `Grade: ${p.grade}`,
-    `Likes at school: ${list(p.subjects)}`,
-    `Loves to do: ${list(p.loves)}`,
-    `Good at: ${list(p.goodAt)}`,
+    `Likes at school: ${list([...p.subjects, ...(p.otherSubject?.trim() ? [p.otherSubject.trim()] : [])])}`,
+    `Loves to do: ${list([...p.loves, ...(p.otherLove?.trim() ? [p.otherLove.trim()] : [])])}`,
+    `Good at: ${list([...p.goodAt, ...(p.otherGoodAt?.trim() ? [p.otherGoodAt.trim()] : [])])}`,
     quiz.length > 0 && `Quiz answers:\n${quiz.join("\n")}`,
     p.extra && `Also loves: ${p.extra.slice(0, 200)}`,
   ]

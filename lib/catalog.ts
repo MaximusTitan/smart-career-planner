@@ -165,6 +165,20 @@ const CATALOG: Entry[] = [
     ],
   },
   {
+    id: "photographer", emoji: "📷", title: "Photographer",
+    tagline: "Capture moments and tell stories with pictures",
+    tags: ["photography", "art", "stories", "outdoors", "ideas", "computers"],
+    day: ["Plan a photo shoot", "Take pictures with a camera", "Edit and share your best shots"],
+    skills: ["Creative", "Observant", "Patient"], pay: 3, demand: 3,
+    studyNow: ["Art", "Computers", "Reading"], studyLater: ["Photography", "Digital media", "Visual design"],
+    road: [
+      ["Art and Reading", "Take 5 photos of your day", "Make a photo story"],
+      ["Art and Computers", "Try light and shadow", "Edit a photo on a computer"],
+      ["Art and Media", "Join a photo or media club", "Show a photo set to class"],
+      ["Photography and design", "Shoot a school event", "Build a photo portfolio"],
+    ],
+  },
+  {
     id: "park-ranger", emoji: "🌳", title: "Park Ranger",
     tagline: "Protect nature and wild animals",
     tags: ["outdoors", "animals", "science", "sports", "people"],
@@ -183,7 +197,7 @@ const CATALOG: Entry[] = [
 const TAG_WORDS: Record<string, string> = {
   math: "maths", science: "science", art: "art", reading: "reading", stories: "stories",
   sports: "sports", computers: "computers", games: "games", build: "building", animals: "animals",
-  music: "music", people: "helping people", puzzles: "puzzles", ideas: "new ideas",
+  music: "music", photography: "photography", people: "helping people", puzzles: "puzzles", ideas: "new ideas",
   talking: "talking", outdoors: "being outside",
 };
 
@@ -233,7 +247,7 @@ export function matchCareers(profile: Profile, count = 8): Career[] {
 }
 
 const ALIASES: Record<string, string> = {
-  vet: "animal-doctor", veterinar: "animal-doctor", "game": "game-maker", "robot": "robot-builder",
+  vet: "animal-doctor", photo: "photographer", camera: "photographer", veterinar: "animal-doctor", "game": "game-maker", "robot": "robot-builder",
   scien: "scientist", cartoon: "animator", singer: "musician", music: "musician", guitar: "musician",
   coach: "sports-coach", writer: "author", book: "author", ranger: "park-ranger", engineer: "robot-builder",
 };

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Ollie } from "@/components/Ollie";
 import { Button, ButtonLink } from "@/components/ui";
 import { Loading } from "@/components/Loading";
-import { QUIZ } from "@/lib/options";
+import { OTHER_LABEL, QUIZ, quizAnswerText } from "@/lib/options";
 import { useStore } from "@/lib/store";
 
 export default function Quiz() {
@@ -22,6 +22,9 @@ function QuizSteps() {
   const q = QUIZ[step];
   const isLast = step === QUIZ.length - 1;
   const picked = profile.quiz[step];
+  const isOther = picked === OTHER_LABEL;
+  // "Other" needs some words before moving on.
+  const answered = Boolean(picked) && (!isOther || quizAnswerText(profile, step).length > 0);
 
   async function finish() {
     if (await findJobs()) router.push("/jobs");
@@ -50,7 +53,9 @@ function QuizSteps() {
       <div className="h-4 overflow-hidden rounded-full bg-violet-100" aria-hidden>
         <div
           className="h-full rounded-full bg-orange-400 transition-all"
-          style={{ width: `${((step + (picked ? 1 : 0)) / QUIZ.length) * 100}%` }}
+          style={{
+            width: `${((step + (picked ? 1 : 0)) / QUIZ.length) * 100}%`,
+          }}
         />
       </div>
 
@@ -83,7 +88,44 @@ function QuizSteps() {
             </button>
           );
         })}
+        {q.allowOther && (
+          <button
+            aria-pressed={isOther}
+            onClick={() => updateProfile({ quiz: { ...profile.quiz, [step]: OTHER_LABEL } })}
+            className={`flex min-h-20 items-center justify-center gap-3 rounded-3xl border-4 p-4 text-xl font-extrabold transition active:scale-95 focus-visible:outline-4 focus-visible:outline-sky-400 sm:col-span-2 ${
+              isOther
+                ? "border-violet-600 bg-violet-600 text-white shadow-lg"
+                : "border-violet-200 bg-white hover:border-violet-400"
+            }`}
+          >
+            <span className="text-4xl" aria-hidden>
+              ✍️
+            </span>
+            Something else
+          </button>
+        )}
       </div>
+
+      {q.allowOther && isOther && (
+        <label className="block space-y-2">
+          <span className="text-lg font-extrabold text-violet-900">{q.allowOther.prompt}</span>
+          <input
+            value={profile.quizOther?.[step] ?? ""}
+            onChange={(e) =>
+              updateProfile({
+                quizOther: {
+                  ...profile.quizOther,
+                  [step]: e.target.value.slice(0, 40),
+                },
+              })
+            }
+            placeholder={q.allowOther.placeholder}
+            autoComplete="off"
+            autoFocus
+            className="w-full rounded-2xl border-2 border-violet-200 px-4 py-3 text-xl focus:border-violet-500 focus:outline-none"
+          />
+        </label>
+      )}
 
       {isLast && (
         <label className="block space-y-2">
@@ -108,11 +150,11 @@ function QuizSteps() {
           ← Back
         </Button>
         {isLast ? (
-          <Button variant="success" disabled={!picked} onClick={finish}>
+          <Button variant="success" disabled={!answered} onClick={finish}>
             See my jobs ✨
           </Button>
         ) : (
-          <Button disabled={!picked} onClick={() => setStep(step + 1)}>
+          <Button disabled={!answered} onClick={() => setStep(step + 1)}>
             Next →
           </Button>
         )}

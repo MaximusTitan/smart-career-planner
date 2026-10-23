@@ -31,6 +31,14 @@ export type Profile = {
   goodAt: string[];
   quiz: Record<number, string>;
   extra: string;
+  /** A school subject the student typed themselves (the "Other" choice). */
+  otherSubject?: string;
+  /** Something to do the student typed themselves (the "Other" choice under "I love to"). */
+  otherLove?: string;
+  /** Something the student is good at that they typed themselves (the "Other" choice under "I'm good at"). */
+  otherGoodAt?: string;
+  /** Custom quiz answers typed under "Other", by question number. */
+  quizOther?: Record<number, string>;
 };
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
