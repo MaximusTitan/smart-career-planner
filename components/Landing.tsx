@@ -21,7 +21,7 @@ const FEATURES = [
   { emoji: "📅", title: "A day in the life", text: "Find out what people in each job actually do, in plain words." },
   { emoji: "🖨️", title: "Share your plan", text: "Print it or send a link so your family can cheer you on." },
   { emoji: "⚡", title: "Save your favourites", text: "Keep the jobs you like in one place and come back any time." },
-  { emoji: "🎓", title: "Made for Grades 4 to 12", text: "Simple words and ideas that grow with you." },
+  { emoji: "🎓", title: "Made for Grades 1 to 12", text: "Simple words and ideas that grow with you." },
 ];
 
 export function Landing() {
@@ -35,7 +35,7 @@ export function Landing() {
         <div className="relative grid items-center gap-8 md:grid-cols-[1fr_auto]">
           <div className="space-y-5">
             <p className="inline-block rounded-full bg-white px-4 py-1 text-base font-extrabold text-violet-700 shadow-sm">
-              For students in Grades 4 to 12
+              For students in Grades 1 to 12
             </p>
             <h1 className="text-5xl font-black leading-tight text-violet-950 sm:text-6xl">
               Find what you <span className="text-violet-600">could become</span>

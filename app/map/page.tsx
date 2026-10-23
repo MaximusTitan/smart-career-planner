@@ -29,14 +29,18 @@ export default function AdventureMap() {
 
       <ol className="grid gap-4 md:grid-cols-4">
         {selected.roadmap.map((stage, i) => {
-          const current = profile.grade !== null && stage.grade === (profile.grade >= 7 ? "Grade 7+" : `Grade ${profile.grade}`);
+          const current =
+            profile.grade !== null &&
+            stage.grade === (profile.grade >= 7 ? "Grade 7+" : `Grade ${Math.max(profile.grade, 4)}`);
           return (
             <li key={stage.grade} className="relative">
               <Card className={`h-full space-y-3 ${current ? "border-orange-400 ring-4 ring-orange-200" : ""}`}>
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-black text-violet-900">{stage.grade}</h2>
                   {current && (
-                    <span className="rounded-full bg-orange-500 px-2 py-0.5 text-sm font-extrabold text-white">You are here</span>
+                    <span className="rounded-full bg-orange-500 px-2 py-0.5 text-sm font-extrabold text-white">
+                      You are here
+                    </span>
                   )}
                 </div>
                 <p className="text-lg font-bold">📚 {stage.subjects}</p>

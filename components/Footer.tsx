@@ -16,7 +16,7 @@ export function Footer() {
         <div className="space-y-3">
           <Image src="/logo.png" alt="Smart Career Planner" width={1014} height={239} className="h-9 w-auto" />
           <p className="max-w-sm text-base font-semibold text-slate-600">
-            A friendly AI career explorer for students in Grades 4 to 12. Jobs are ideas to explore, not rules.
+            A friendly AI career explorer for students in Grades 1 to 12. Jobs are ideas to explore, not rules.
           </p>
         </div>
 

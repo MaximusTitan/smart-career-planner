@@ -18,7 +18,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Smart Career Planner: find what you could become",
   description:
-    "A friendly AI career explorer for students in Grades 4 to 12. Answer fun questions, meet your career matches and chat with Ollie the owl.",
+    "A friendly AI career explorer for students in Grades 1 to 12. Answer fun questions, meet your career matches and chat with Ollie the owl.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
